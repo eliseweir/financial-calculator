@@ -21,36 +21,40 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        String input;
+        String command;
+        String[] commands;
 
-        // check whether the user entered a command
-        // if not, prompt for one
-        if (args.length < 1) {
-            String input = menu();
-            args = input.split(" ");
-        }
+        System.out.println("Type 'menu' to see available commands, 'exit' to exit");
 
-        // validate command
-        String command = args[0];
-        while(!commandsToUsage.containsKey(command)) {
-            System.out.println(command + ": command not found");
-            System.out.println("Type 'menu' to see available commands, 'exit' to exit");
-            String input = scanner.nextLine();
-            args = input.split(" ");
-            if (args.length < 1) command = "";
-            else command = args[0];
-        }
+        do {
+            // prompt user for a command
+            System.out.print("$ ");
+            input = scanner.nextLine();
+            commands = input.split(" ");
 
-        // validate arguments for a given command
-        boolean isValidCommand = validateCommandArguments(args);
-        if (!isValidCommand) {
-            System.out.println(commandsToUsage.get(command));
-            return;
-        }
+            // validate command
+            command = commands[0];
+            while(!commandsToUsage.containsKey(command)) {
+                System.out.println(command + ": command not found");
+                System.out.println("Type 'menu' to see available commands, 'exit' to exit");
+                input = scanner.nextLine();
+                commands = input.split(" ");
+                if (commands.length < 1) command = "";
+                else command = commands[0];
+            }
 
-        // after validation, run the program
-        executeCommand(command, Arrays.copyOfRange(args, 1, args.length));
+            // validate arguments for a given command
+            boolean isValidCommand = validateCommandArguments(commands);
+            if (!isValidCommand) {
+                System.out.println(commandsToUsage.get(command));
+            } else {
+                // after validation, run the program
+                executeCommand(command, Arrays.copyOfRange(commands, 1, commands.length));
+            }
 
-        scanner.close();
+        } while(!command.equals(EXIT));
+
     }
 
     /**
@@ -61,6 +65,8 @@ public class Main {
     private static void executeCommand(String command, String[] arguments) {
         switch(command) {
             case MENU:
+                menu();
+            case EXIT:
                 break;
             case LOAN_RATE_CALCULATOR:
                 System.out.println("Finding best loan rates...");
@@ -80,8 +86,6 @@ public class Main {
                 mortgageCalculator.calculate();
                 System.out.println(mortgageCalculator.toString());
                 break;
-            case EXIT:
-                break;
             default:
                 System.out.println("Unexpected calculator");
                 break;
@@ -96,6 +100,7 @@ public class Main {
     private static boolean validateCommandArguments(String[] args) {
         switch (args[0]) {
             case MENU:
+                return true;
             case EXIT:
                 return args.length == 1;
             case LOAN_RATE_CALCULATOR:
@@ -111,17 +116,12 @@ public class Main {
 
     }
 
-    private static String menu() {
+    private static void menu() {
         System.out.println("Available commands:");
         System.out.println(MENU);
         System.out.println(LOAN_RATE_CALCULATOR);
         System.out.println(MORTGAGE_CALCULATOR);
         System.out.println(SAVINGS_CALCULATOR);
         System.out.println(EXIT);
-
-        Scanner scanner = new Scanner(System.in);
-        String command = scanner.nextLine();
-        scanner.close();
-        return command;
     }
 }
